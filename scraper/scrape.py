@@ -2,10 +2,10 @@ import asyncio
 import base64
 import json
 import os
-import re
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 
 import gspread
+import requests
 from google.oauth2.service_account import Credentials
 from playwright.async_api import Page, async_playwright
 
@@ -23,10 +23,7 @@ GAME_NAMES = {
 
 SHEET_HEADERS = ["thread_id", "headline", "title", "author", "date", "view_count", "likes", "comments", "url", "content"]
 
-SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive",
-]
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 
 @dataclass
@@ -43,27 +40,41 @@ class Post:
     content: str = ""
 
 
-def build_gspread_client() -> gspread.Client:
+def load_sa_info() -> dict:
     raw = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
     try:
-        sa_info = json.loads(base64.b64decode(raw).decode())
+        return json.loads(base64.b64decode(raw).decode())
     except Exception:
-        sa_info = json.loads(raw)
+        return json.loads(raw)
+
+
+def build_gspread_client(sa_info: dict) -> gspread.Client:
     creds = Credentials.from_service_account_info(sa_info, scopes=SCOPES)
     return gspread.authorize(creds)
 
 
-def get_or_create_spreadsheet(gc: gspread.Client, game_slug: str) -> gspread.Spreadsheet:
+def get_or_create_spreadsheet(gc: gspread.Client, sa_email: str, game_slug: str) -> gspread.Spreadsheet:
+    """GAS 웹앱을 통해 유저 Drive에 파일을 생성하고, 서비스 계정에 편집 권한을 부여받은 뒤 열기."""
     title = f"[넥슨포럼] {GAME_NAMES.get(game_slug, game_slug)}"
-    try:
-        return gc.open(title)
-    except gspread.SpreadsheetNotFound:
-        ss = gc.create(title)
-        ss.share(None, perm_type="anyone", role="reader")
-        owner_email = os.environ.get("GOOGLE_OWNER_EMAIL")
-        if owner_email:
-            ss.share(owner_email, perm_type="user", role="writer")
-        return ss
+    gas_url = os.environ["GAS_ENDPOINT"]
+    folder_id = os.environ["GOOGLE_DRIVE_FOLDER_ID"]
+
+    resp = requests.post(
+        gas_url,
+        json={"folderId": folder_id, "fileName": title, "serviceAccountEmail": sa_email},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+
+    if not data.get("ok"):
+        raise RuntimeError(f"GAS 오류: {data.get('error')}")
+
+    spreadsheet_id = data["spreadsheetId"]
+    reused = data.get("reused", False)
+    print(f"스프레드시트 {'재사용' if reused else '신규 생성'}: {spreadsheet_id}")
+
+    return gc.open_by_key(spreadsheet_id)
 
 
 def get_or_create_worksheet(ss: gspread.Spreadsheet, board_id: int, board_name: str) -> gspread.Worksheet:
@@ -136,9 +147,20 @@ async def scrape_list_page(page: Page, base_url: str, board_id: int, page_num: i
             if date_el:
                 date = (await date_el.inner_text()).strip()
 
-            view_count = (await (await item.query_selector(".count-read")).inner_text()).strip() if await item.query_selector(".count-read") else "0"
-            likes = (await (await item.query_selector(".count-likes")).inner_text()).strip() if await item.query_selector(".count-likes") else "0"
-            comments = (await (await item.query_selector(".count-comment")).inner_text()).strip() if await item.query_selector(".count-comment") else "0"
+            view_count = "0"
+            view_el = await item.query_selector(".count-read")
+            if view_el:
+                view_count = (await view_el.inner_text()).strip()
+
+            likes = "0"
+            likes_el = await item.query_selector(".count-likes")
+            if likes_el:
+                likes = (await likes_el.inner_text()).strip()
+
+            comments = "0"
+            comments_el = await item.query_selector(".count-comment")
+            if comments_el:
+                comments = (await comments_el.inner_text()).strip()
 
             posts.append(Post(
                 thread_id=thread_id or "",
@@ -192,8 +214,9 @@ async def main() -> None:
     board_name = os.environ.get("BOARD_NAME", str(board_id))
     base_url = f"{NEXON_FORUM}/{game_slug}"
 
-    gc = build_gspread_client()
-    ss = get_or_create_spreadsheet(gc, game_slug)
+    sa_info = load_sa_info()
+    gc = build_gspread_client(sa_info)
+    ss = get_or_create_spreadsheet(gc, sa_info["client_email"], game_slug)
     ws = get_or_create_worksheet(ss, board_id, board_name)
     existing_ids = get_existing_thread_ids(ws)
     print(f"기존 게시글 수: {len(existing_ids)}")
@@ -236,7 +259,6 @@ async def main() -> None:
     save_sheet_url(game_slug, ss.url)
 
     print(f"완료. 스프레드시트: {ss.url}")
-    print(f"SHEET_URL={ss.url}")
 
 
 if __name__ == "__main__":
