@@ -60,6 +60,9 @@ def get_or_create_spreadsheet(gc: gspread.Client, game_slug: str) -> gspread.Spr
     except gspread.SpreadsheetNotFound:
         ss = gc.create(title)
         ss.share(None, perm_type="anyone", role="reader")
+        owner_email = os.environ.get("GOOGLE_OWNER_EMAIL")
+        if owner_email:
+            ss.share(owner_email, perm_type="user", role="writer")
         return ss
 
 
