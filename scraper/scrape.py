@@ -179,21 +179,35 @@ async def scrape_list_page(page: Page, base_url: str, board_id: int, page_num: i
     return posts
 
 
-async def fetch_content(page: Page, post: Post) -> str:
+async def fetch_content_and_datetime(page: Page, post: Post) -> tuple[str, str]:
+    """본문과 정확한 작성일시(시간 포함)를 함께 반환."""
     if not post.url:
-        return ""
+        return "", post.date
     try:
         await page.goto(post.url, wait_until="networkidle", timeout=30000)
         await page.wait_for_timeout(500)
+
+        # 글 페이지의 .date는 "2026.04.30 09:00" 형식으로 시간 포함
+        datetime_str = post.date
+        date_el = await page.query_selector(".article-info .date")
+        if date_el:
+            full_date = (await date_el.inner_text()).strip()
+            if full_date:
+                datetime_str = full_date
+
+        content = ""
         for sel in [".contents-box", ".view-box", ".post-content", ".post-body", ".article-body"]:
             el = await page.query_selector(sel)
             if el:
                 text = (await el.inner_text()).strip()
                 if text:
-                    return text
+                    content = text
+                    break
+
+        return content, datetime_str
     except Exception as e:
         print(f"[경고] 본문 스크래핑 실패 ({post.thread_id}): {e}")
-    return ""
+    return "", post.date
 
 
 def save_sheet_url(game_slug: str, url: str) -> None:
@@ -250,7 +264,7 @@ async def main() -> None:
 
         for i, post in enumerate(new_posts, 1):
             print(f"  [{i}/{len(new_posts)}] {post.title[:50]}...")
-            post.content = await fetch_content(page, post)
+            post.content, post.date = await fetch_content_and_datetime(page, post)
             await asyncio.sleep(1)
 
         await browser.close()
