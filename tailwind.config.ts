@@ -1,10 +1,21 @@
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss'
 
-export default {
+const config: Config = {
   content: [
-    "./app/**/*.{ts,tsx}",
-    "./lib/**/*.{ts,tsx}",
+    './app/**/*.{ts,tsx}',
+    './lib/**/*.{ts,tsx}',
   ],
-  theme: { extend: {} },
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: [
+          'Pretendard Variable', 'Pretendard',
+          '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif',
+        ],
+      },
+    },
+  },
   plugins: [],
-} satisfies Config;
+}
+
+export default config

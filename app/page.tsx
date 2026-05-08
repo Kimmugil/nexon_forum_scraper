@@ -23,48 +23,6 @@ const GAME_EMOJI: Record<string, string> = {
   "v4kr": "⚔️",
 };
 
-const S = {
-  page:    { minHeight: "100vh", background: "#FAFAFA", fontFamily: "inherit" } as React.CSSProperties,
-  nav:     { position: "sticky" as const, top: 0, zIndex: 50, background: "#fff", borderBottom: "2px solid #1A1A1A" },
-  navInner:{ maxWidth: 720, margin: "0 auto", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" },
-  navLeft: { display: "flex", alignItems: "center", gap: 8 },
-  navTitle:{ fontWeight: 900, fontSize: 15, color: "#1A1A1A" },
-  main:    { maxWidth: 720, margin: "0 auto", padding: "40px 20px 60px" },
-  label:   { fontSize: 11, fontWeight: 900, color: "#9CA3AF", textTransform: "uppercase" as const, letterSpacing: "0.08em", marginBottom: 12 },
-  card:    { background: "#fff", border: "2px solid #1A1A1A", borderRadius: 14, padding: 24, marginBottom: 24 },
-  gameGrid:{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 } as React.CSSProperties,
-  gameBtn: (active: boolean): React.CSSProperties => ({
-    textAlign: "left",
-    padding: "12px 14px",
-    background: active ? "#1A1A1A" : "#fff",
-    border: "2px solid #1A1A1A",
-    borderRadius: 10,
-    color: active ? "#fff" : "#1A1A1A",
-    fontWeight: 700,
-    fontSize: 13,
-    cursor: "pointer",
-  }),
-  row:     { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" as const },
-  select:  { flex: 1, minWidth: 0, background: "#FAFAFA", border: "2px solid #1A1A1A", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontWeight: 600, color: "#1A1A1A", cursor: "pointer" } as React.CSSProperties,
-  btn:     (color: string, text = "#fff"): React.CSSProperties => ({
-    flexShrink: 0,
-    border: "2px solid #1A1A1A",
-    borderRadius: 9999,
-    boxShadow: "2px 2px 0 #1A1A1A",
-    background: color,
-    color: text,
-    fontWeight: 800,
-    fontSize: 13,
-    padding: "10px 20px",
-    cursor: "pointer",
-    transition: "box-shadow .1s, transform .1s",
-    whiteSpace: "nowrap" as const,
-  }),
-  link:    { fontSize: 12, color: "#9CA3AF", textDecoration: "none" },
-  sheetGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 } as React.CSSProperties,
-  sheetCard: { display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "#fff", border: "2px solid #1A1A1A", borderRadius: 12, textDecoration: "none", cursor: "pointer" } as React.CSSProperties,
-};
-
 export default function Home() {
   const [selectedGame, setSelectedGame] = useState<Game>(GAMES[0]);
   const [selectedBoard, setSelectedBoard] = useState<Board>(GAMES[0].boards[0]);
@@ -121,117 +79,170 @@ export default function Home() {
 
   const isRunning = ["triggering", "queued", "in_progress"].includes(run.status);
 
-  const statusBadge = () => {
+  const StatusBadge = () => {
     const cfgs = {
-      triggering:  { label: "요청 중...", bg: "#FEF9C3", border: "#FDE047", color: "#854D0E" },
-      queued:      { label: "대기 중",   bg: "#FEF9C3", border: "#FDE047", color: "#854D0E" },
-      in_progress: { label: "실행 중",   bg: "#DBEAFE", border: "#93C5FD", color: "#1E40AF" },
-      completed:   { label: "완료 ✓",   bg: "#D1FAE5", border: "#6EE7B7", color: "#065F46" },
-      failure:     { label: "실패 ✗",   bg: "#FEE2E2", border: "#FCA5A5", color: "#991B1B" },
+      triggering:  { label: "요청 중...",  cls: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
+      queued:      { label: "대기 중",     cls: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
+      in_progress: { label: "실행 중",     cls: "bg-blue-50 text-blue-700 border border-blue-200" },
+      completed:   { label: "완료 ✓",     cls: "bg-green-50 text-green-700 border border-green-200" },
+      failure:     { label: "실패 ✗",     cls: "bg-red-50 text-red-700 border border-red-200" },
     };
     if (run.status === "idle") return null;
     const c = cfgs[run.status as keyof typeof cfgs];
     return (
-      <span style={{ fontSize: 12, fontWeight: 900, padding: "4px 12px", borderRadius: 9999, background: c.bg, border: `2px solid ${c.border}`, color: c.color }}>
+      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${c.cls}`}>
         {c.label}
       </span>
     );
   };
 
   return (
-    <div style={S.page}>
+    <div className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <nav style={S.nav}>
-        <div style={S.navInner}>
-          <div style={S.navLeft}>
+      <header className="bg-gray-900 text-white sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto px-4 h-12 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="" style={{ width: 26, height: 26, borderRadius: 6, objectFit: "cover" }} />
-            <span style={S.navTitle}>넥슨 포럼 스크래퍼</span>
+            <img src="/icon.png" alt="" className="w-6 h-6 rounded-md object-cover" />
+            <span className="text-sm font-semibold">넥슨 포럼 스크래퍼</span>
           </div>
-          <button onClick={async () => { await fetch("/api/auth", { method: "DELETE" }); router.push("/login"); }}
-            style={{ fontSize: 12, color: "#B0B0B0", background: "none", border: "none", cursor: "pointer" }}>
+          <button
+            onClick={async () => { await fetch("/api/auth", { method: "DELETE" }); router.push("/login"); }}
+            className="text-xs text-gray-400 hover:text-white transition-colors"
+          >
             로그아웃
           </button>
         </div>
-      </nav>
+      </header>
 
-      <main style={S.main}>
-        {/* Step 1 */}
-        <div style={{ marginBottom: 8 }}><span style={S.label}>Step 1 — 게임 선택</span></div>
-        <div style={{ ...S.gameGrid, marginBottom: 24 }}>
-          {GAMES.map((game) => (
-            <button key={game.slug} onClick={() => handleGameChange(game.slug)} style={S.gameBtn(selectedGame.slug === game.slug)}>
-              <span style={{ display: "block", fontSize: 18, marginBottom: 2 }}>{GAME_EMOJI[game.slug] ?? "🎮"}</span>
-              {game.name}
-            </button>
-          ))}
-        </div>
+      <main className="max-w-2xl mx-auto px-4 py-8 space-y-6">
 
-        {/* Step 2 */}
-        <div style={S.card}>
-          <div style={{ marginBottom: 16 }}><span style={S.label}>Step 2 — 게시판 선택 후 스크래핑</span></div>
-          <div style={S.row}>
-            <select value={selectedBoard.id} onChange={(e) => { setSelectedBoard(selectedGame.boards.find((b) => b.id === Number(e.target.value))!); setRun({ status: "idle" }); }} style={S.select}>
-              {selectedGame.boards.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+        {/* Step 1 — 게임 선택 */}
+        <section>
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Step 1 — 게임 선택</p>
+          <div className="grid grid-cols-2 gap-2">
+            {GAMES.map((game) => (
+              <button
+                key={game.slug}
+                onClick={() => handleGameChange(game.slug)}
+                className={`text-left px-4 py-3 rounded-lg border text-sm font-medium transition-colors ${
+                  selectedGame.slug === game.slug
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                }`}
+              >
+                <span className="block text-lg mb-0.5">{GAME_EMOJI[game.slug] ?? "🎮"}</span>
+                {game.name}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Step 2 — 게시판 선택 + 스크래핑 */}
+        <section className="bg-white border border-gray-200 rounded-xl p-5">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">Step 2 — 게시판 선택 후 스크래핑</p>
+          <div className="flex flex-wrap gap-2 items-center">
+            <select
+              value={selectedBoard.id}
+              onChange={(e) => {
+                setSelectedBoard(selectedGame.boards.find((b) => b.id === Number(e.target.value))!);
+                setRun({ status: "idle" });
+              }}
+              className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
+            >
+              {selectedGame.boards.map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
             </select>
-            <button onClick={handleScrape} disabled={isRunning} style={S.btn(isRunning ? "#F0EFEC" : "#00C73C", isRunning ? "#9CA3AF" : "#fff")}>
+            <button
+              onClick={handleScrape}
+              disabled={isRunning}
+              className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-colors shadow-sm ${
+                isRunning
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-green-500 text-white hover:bg-green-600 shadow-green-200"
+              }`}
+            >
               {isRunning ? "실행 중..." : "🚀 스크래핑 시작"}
             </button>
             {sheetMap[selectedGame.slug] && (
-              <a href={sheetMap[selectedGame.slug]} target="_blank" rel="noreferrer" style={{ ...S.btn("#fff", "#1A1A1A"), textDecoration: "none", display: "inline-block" }}>
+              <a
+                href={sheetMap[selectedGame.slug]}
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0 px-5 py-2 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-700 hover:border-gray-400 transition-colors"
+              >
                 📊 시트 열기
               </a>
             )}
           </div>
-        </div>
+        </section>
 
         {/* 실행 상태 */}
         {run.status !== "idle" && (
-          <div style={S.card}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <span style={{ fontWeight: 900, fontSize: 14 }}>실행 상태</span>
-              {statusBadge()}
+          <section className="bg-white border border-gray-200 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-semibold text-gray-900">실행 상태</span>
+              <StatusBadge />
             </div>
+
             {isRunning && (
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <span style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid #1A1A1A", borderTopColor: "transparent", display: "inline-block", animation: "spin 1s linear infinite", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, color: "#4A4A4A" }}>GitHub Actions에서 스크래핑 중입니다. 수 분 소요될 수 있습니다.</span>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="w-4 h-4 rounded-full border-2 border-gray-300 border-t-gray-700 inline-block animate-spin shrink-0" />
+                <span className="text-sm text-gray-500">GitHub Actions에서 스크래핑 중입니다. 수 분 소요될 수 있습니다.</span>
               </div>
             )}
+
             {run.status === "completed" && (
-              <div style={{ padding: "12px 16px", borderRadius: 10, background: "#F0FDF4", border: "2px solid #6EE7B7", marginBottom: 12 }}>
-                <p style={{ fontWeight: 700, fontSize: 13, color: "#065F46", margin: 0 }}>✓ 스크래핑 완료! 신규 게시글이 시트에 추가되었습니다.</p>
-                {run.sheetUrl && <a href={run.sheetUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#059669" }}>→ Google Sheets 바로가기</a>}
+              <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 mb-3">
+                <p className="text-sm font-medium text-green-700">✓ 스크래핑 완료! 신규 게시글이 시트에 추가되었습니다.</p>
+                {run.sheetUrl && (
+                  <a href={run.sheetUrl} target="_blank" rel="noreferrer" className="text-xs text-green-600 hover:underline mt-1 inline-block">
+                    → Google Sheets 바로가기
+                  </a>
+                )}
               </div>
             )}
+
             {run.status === "failure" && (
-              <div style={{ padding: "12px 16px", borderRadius: 10, background: "#FFF5F5", border: "2px solid #FCA5A5", marginBottom: 12 }}>
-                <p style={{ fontWeight: 700, fontSize: 13, color: "#991B1B", margin: 0 }}>✗ {run.message ?? "오류가 발생했습니다."}</p>
+              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 mb-3">
+                <p className="text-sm font-medium text-red-700">✗ {run.message ?? "오류가 발생했습니다."}</p>
               </div>
             )}
-            {run.runUrl && <a href={run.runUrl} target="_blank" rel="noreferrer" style={S.link}>GitHub Actions 로그 확인 →</a>}
-          </div>
+
+            {run.runUrl && (
+              <a href={run.runUrl} target="_blank" rel="noreferrer" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                GitHub Actions 로그 확인 →
+              </a>
+            )}
+          </section>
         )}
 
         {/* 수집된 시트 목록 */}
         {Object.keys(sheetMap).length > 0 && (
-          <div>
-            <div style={{ marginBottom: 10 }}><span style={S.label}>수집된 포럼 시트</span></div>
-            <div style={S.sheetGrid}>
+          <section>
+            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">수집된 포럼 시트</p>
+            <div className="grid grid-cols-2 gap-2">
               {Object.entries(sheetMap).map(([slug, url]) => (
-                <a key={slug} href={url} target="_blank" rel="noreferrer" style={S.sheetCard}>
-                  <span style={{ fontSize: 22 }}>{GAME_EMOJI[slug] ?? "🎮"}</span>
+                <a
+                  key={slug}
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-gray-400 transition-colors"
+                >
+                  <span className="text-xl">{GAME_EMOJI[slug] ?? "🎮"}</span>
                   <div>
-                    <p style={{ fontWeight: 700, fontSize: 13, color: "#1A1A1A", margin: 0 }}>{GAMES.find((g) => g.slug === slug)?.name ?? slug}</p>
-                    <p style={{ fontSize: 11, color: "#9CA3AF", margin: 0 }}>Google Sheets 열기 ↗</p>
+                    <p className="text-sm font-medium text-gray-800">{GAMES.find((g) => g.slug === slug)?.name ?? slug}</p>
+                    <p className="text-xs text-gray-400">Google Sheets 열기 ↗</p>
                   </div>
                 </a>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        <p style={{ textAlign: "center", fontSize: 11, color: "#D1D5DB", marginTop: 40 }}>이미 수집된 게시글은 자동으로 건너뜁니다</p>
+        <p className="text-center text-xs text-gray-300 pt-2">이미 수집된 게시글은 자동으로 건너뜁니다</p>
       </main>
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

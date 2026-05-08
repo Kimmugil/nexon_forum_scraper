@@ -29,27 +29,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FAFAFA", padding: "0 16px", fontFamily: "inherit" }}>
-      <div style={{ width: "100%", maxWidth: 360, background: "#fff", border: "2px solid #1A1A1A", borderRadius: 20, padding: "40px 32px 32px" }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-8">
+
+        <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.png" alt="logo" style={{ width: 36, height: 36, borderRadius: 8, objectFit: "cover", margin: "0 auto 12px" }} />
-          <h1 style={{ fontWeight: 900, fontSize: 18, color: "#1A1A1A", margin: 0 }}>넥슨 포럼 스크래퍼</h1>
-          <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>관리자 비밀번호를 입력하세요</p>
+          <img src="/icon.png" alt="logo" className="w-9 h-9 rounded-lg object-cover mx-auto mb-3" />
+          <h1 className="text-base font-bold text-gray-900">넥슨 포럼 스크래퍼</h1>
+          <p className="text-xs text-gray-400 mt-1">관리자 비밀번호를 입력하세요</p>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="비밀번호"
             autoFocus
-            style={{ width: "100%", padding: "10px 14px", border: "2px solid #1A1A1A", borderRadius: 10, fontSize: 14, color: "#1A1A1A", background: "#FAFAFA", boxSizing: "border-box", outline: "none", fontFamily: "inherit" }}
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400"
           />
 
           {error && (
-            <p style={{ fontSize: 13, padding: "10px 14px", borderRadius: 10, background: "#FFF5F5", border: "2px solid #FCA5A5", color: "#991B1B", margin: 0 }}>
+            <p className="text-xs px-4 py-2.5 rounded-lg bg-red-50 border border-red-200 text-red-600">
               ⚠️ {error}
             </p>
           )}
@@ -57,7 +58,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading || !password}
-            style={{ width: "100%", padding: "12px", border: "2px solid #1A1A1A", borderRadius: 9999, boxShadow: "2px 2px 0 #1A1A1A", background: loading || !password ? "#F0EFEC" : "#00C73C", color: loading || !password ? "#9CA3AF" : "#fff", fontWeight: 800, fontSize: 14, cursor: loading || !password ? "not-allowed" : "pointer", fontFamily: "inherit" }}
+            className={`w-full py-2.5 rounded-full text-sm font-semibold transition-colors shadow-sm ${
+              loading || !password
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-green-500 text-white hover:bg-green-600"
+            }`}
           >
             {loading ? "확인 중..." : "입장하기"}
           </button>

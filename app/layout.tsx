@@ -1,13 +1,5 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-
-const pretendard = localFont({
-  src: "./fonts/PretendardVariable.woff2",
-  variable: "--font-pretendard",
-  weight: "100 900",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "넥슨 포럼 스크래퍼",
@@ -16,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={`${pretendard.variable} ${pretendard.className}`}>
-      <body className="min-h-screen" style={{ background: "#FAFAFA", fontFamily: pretendard.style.fontFamily }}>
+    <html lang="ko">
+      <body className="min-h-screen bg-gray-50 text-gray-900">
         {children}
       </body>
     </html>
