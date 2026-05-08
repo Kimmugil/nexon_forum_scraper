@@ -51,7 +51,7 @@ export default function LoginPage() {
 
           {error && (
             <p className="text-xs px-4 py-2.5 rounded-lg bg-red-50 border border-red-200 text-red-600">
-              ⚠️ {error}
+              {error}
             </p>
           )}
 

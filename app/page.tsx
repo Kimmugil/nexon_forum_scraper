@@ -13,15 +13,6 @@ interface RunInfo {
   message?: string;
 }
 
-const GAME_EMOJI: Record<string, string> = {
-  "maplestoryidle-kr": "🍁",
-  "azurpromilia": "⚓",
-  "bluearchive": "📘",
-  "baramy": "🌬️",
-  "fcmobile": "⚽",
-  "kartrush": "🏎️",
-  "v4kr": "⚔️",
-};
 
 export default function Home() {
   const [selectedGame, setSelectedGame] = useState<Game>(GAMES[0]);
@@ -81,11 +72,11 @@ export default function Home() {
 
   const StatusBadge = () => {
     const cfgs = {
-      triggering:  { label: "요청 중...",  cls: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
-      queued:      { label: "대기 중",     cls: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
-      in_progress: { label: "실행 중",     cls: "bg-blue-50 text-blue-700 border border-blue-200" },
-      completed:   { label: "완료 ✓",     cls: "bg-green-50 text-green-700 border border-green-200" },
-      failure:     { label: "실패 ✗",     cls: "bg-red-50 text-red-700 border border-red-200" },
+      triggering:  { label: "요청 중...", cls: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
+      queued:      { label: "대기 중",    cls: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
+      in_progress: { label: "실행 중",    cls: "bg-blue-50 text-blue-700 border border-blue-200" },
+      completed:   { label: "완료",       cls: "bg-green-50 text-green-700 border border-green-200" },
+      failure:     { label: "실패",       cls: "bg-red-50 text-red-700 border border-red-200" },
     };
     if (run.status === "idle") return null;
     const c = cfgs[run.status as keyof typeof cfgs];
@@ -131,7 +122,6 @@ export default function Home() {
                     : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
                 }`}
               >
-                <span className="block text-lg mb-0.5">{GAME_EMOJI[game.slug] ?? "🎮"}</span>
                 {game.name}
               </button>
             ))}
@@ -163,7 +153,7 @@ export default function Home() {
                   : "bg-green-500 text-white hover:bg-green-600 shadow-green-200"
               }`}
             >
-              {isRunning ? "실행 중..." : "🚀 스크래핑 시작"}
+              {isRunning ? "실행 중..." : "스크래핑 시작"}
             </button>
             {sheetMap[selectedGame.slug] && (
               <a
@@ -172,7 +162,7 @@ export default function Home() {
                 rel="noreferrer"
                 className="shrink-0 px-5 py-2 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-700 hover:border-gray-400 transition-colors"
               >
-                📊 시트 열기
+                시트 열기
               </a>
             )}
           </div>
@@ -195,7 +185,7 @@ export default function Home() {
 
             {run.status === "completed" && (
               <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 mb-3">
-                <p className="text-sm font-medium text-green-700">✓ 스크래핑 완료! 신규 게시글이 시트에 추가되었습니다.</p>
+                <p className="text-sm font-medium text-green-700">스크래핑 완료! 신규 게시글이 시트에 추가되었습니다.</p>
                 {run.sheetUrl && (
                   <a href={run.sheetUrl} target="_blank" rel="noreferrer" className="text-xs text-green-600 hover:underline mt-1 inline-block">
                     → Google Sheets 바로가기
@@ -206,7 +196,7 @@ export default function Home() {
 
             {run.status === "failure" && (
               <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 mb-3">
-                <p className="text-sm font-medium text-red-700">✗ {run.message ?? "오류가 발생했습니다."}</p>
+                <p className="text-sm font-medium text-red-700">{run.message ?? "오류가 발생했습니다."}</p>
               </div>
             )}
 
@@ -231,10 +221,9 @@ export default function Home() {
                   rel="noreferrer"
                   className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-gray-400 transition-colors"
                 >
-                  <span className="text-xl">{GAME_EMOJI[slug] ?? "🎮"}</span>
                   <div>
                     <p className="text-sm font-medium text-gray-800">{GAMES.find((g) => g.slug === slug)?.name ?? slug}</p>
-                    <p className="text-xs text-gray-400">Google Sheets 열기 ↗</p>
+                    <p className="text-xs text-gray-400">Google Sheets 열기</p>
                   </div>
                 </a>
               ))}
