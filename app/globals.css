@@ -1,1 +1,78 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; font-family: inherit; }
+  button, input, textarea, select { font-family: inherit; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+  body { background: #FAFAFA; color: #1A1A1A; }
+  *:focus-visible { outline: 2px solid #00C73C; outline-offset: 2px; }
+}
+
+@layer components {
+  .card {
+    background: #FFFFFF;
+    border: 2px solid #1A1A1A;
+    border-radius: 16px;
+  }
+  .card-hover {
+    background: #FFFFFF;
+    border: 2px solid #1A1A1A;
+    border-radius: 16px;
+    box-shadow: 2px 2px 0px 0px #1A1A1A;
+    transition: box-shadow 0.1s ease, transform 0.1s ease;
+    cursor: pointer;
+  }
+  .card-hover:hover {
+    box-shadow: 4px 4px 0px 0px #1A1A1A;
+    transform: translate(-1px, -1px);
+  }
+
+  .neo-button {
+    border: 2px solid #1A1A1A;
+    font-weight: 800;
+    border-radius: 9999px;
+    box-shadow: 2px 2px 0px 0px #1A1A1A;
+    transition: box-shadow 0.1s ease, transform 0.1s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .neo-button:hover  { transform: translate(1px, 1px);  box-shadow: 1px 1px 0px 0px #1A1A1A; }
+  .neo-button:active { transform: translate(2px, 2px);  box-shadow: none; }
+  .neo-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: 2px 2px 0px 0px #1A1A1A !important;
+  }
+
+  .neo-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #FFFFFF;
+    border: 2px solid #1A1A1A;
+    border-radius: 12px;
+    box-shadow: 3px 3px 0px 0px #1A1A1A;
+    transition: box-shadow 0.12s ease, transform 0.12s ease;
+    width: 100%;
+    font-size: 14px;
+    color: #1A1A1A;
+  }
+  .neo-input:focus {
+    outline: none;
+    box-shadow: 5px 5px 0px 0px #1A1A1A;
+    transform: translate(-1px, -1px);
+  }
+}
+
+* { scrollbar-width: thin; scrollbar-color: #E2E8F0 transparent; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
