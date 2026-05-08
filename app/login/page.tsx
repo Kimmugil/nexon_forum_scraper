@@ -38,13 +38,12 @@ export default function LoginPage() {
           background: "#FFFFFF",
           border: "2px solid #1A1A1A",
           borderRadius: 20,
-          boxShadow: "4px 4px 0px 0px #1A1A1A",
           padding: "40px 32px 32px",
         }}
       >
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.png" alt="logo" className="w-12 h-12 mx-auto mb-4" style={{ borderRadius: 10 }} />
+          <img src="/icon.png" alt="logo" className="w-8 h-8 mx-auto mb-4" style={{ borderRadius: 6 }} />
           <h1 className="font-black text-xl" style={{ color: "#1A1A1A" }}>넥슨 포럼 스크래퍼</h1>
           <p className="text-sm mt-1" style={{ color: "#9CA3AF" }}>관리자 비밀번호를 입력하세요</p>
         </div>

@@ -162,7 +162,7 @@ export default function Home() {
                     background: active ? "#1A1A1A" : "#FFFFFF",
                     border: "2px solid #1A1A1A",
                     borderRadius: 12,
-                    boxShadow: active ? "none" : "2px 2px 0px 0px #1A1A1A",
+                    boxShadow: "none",
                     transform: active ? "translate(2px, 2px)" : undefined,
                     color: active ? "#FFFFFF" : "#1A1A1A",
                     fontWeight: 700,
@@ -184,7 +184,6 @@ export default function Home() {
             background: "#FFFFFF",
             border: "2px solid #1A1A1A",
             borderRadius: 16,
-            boxShadow: "4px 4px 0px 0px #1A1A1A",
             padding: "24px",
           }}
         >
@@ -209,7 +208,6 @@ export default function Home() {
                 fontSize: 14,
                 fontWeight: 600,
                 color: "#1A1A1A",
-                boxShadow: "2px 2px 0px 0px #1A1A1A",
                 cursor: "pointer",
               }}
             >
@@ -250,7 +248,6 @@ export default function Home() {
               background: "#FFFFFF",
               border: "2px solid #1A1A1A",
               borderRadius: 16,
-              boxShadow: "4px 4px 0px 0px #1A1A1A",
               padding: "24px",
             }}
           >
